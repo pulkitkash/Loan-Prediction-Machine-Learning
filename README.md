@@ -1,70 +1,111 @@
-# Loan Eligibility Prediction System 🏦
+# LoanSight — AI Loan Eligibility Predictor
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
-[![XGBoost](https://img.shields.io/badge/XGBoost-1.7+-orange.svg)](https://xgboost.readthedocs.io/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+A full-stack Flask web application for predicting loan eligibility using your pre-trained ML model.
 
-> An intelligent machine learning system that predicts loan eligibility with 88% accuracy, helping financial institutions make data-driven credit decisions.
+## Quick Start
 
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Technology Stack](#technology-stack)
-- [Project Architecture](#project-architecture)
-- [Dataset](#dataset)
-- [Model Performance](#model-performance)
-- [Installation Guide](#installation-guide)
-- [Usage](#usage)
-- [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [Screenshots](#screenshots)
-- [Future Scope](#future-scope)
-- [Limitations](#limitations)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+### 1. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-## 🎯 Overview
+### 2. Set up your model
 
-Traditional loan evaluation is often manual, time-consuming, and prone to inconsistency. This project addresses these challenges by building an **automated, data-driven loan eligibility prediction system** that:
+**Option A — Use your real model.pkl:**
+Copy your `model.pkl` into the `loan_app/` folder (same directory as `app.py`).
 
-- Processes applicant data through a robust preprocessing pipeline
-- Uses **XGBoost** (Gradient Boosting) for high-accuracy predictions
-- Provides instant decisions via a user-friendly **Flask web interface**
-- Handles real-world data issues (missing values, outliers, class imbalance)
+**Option B — Generate a demo model:**
+```bash
+python generate_model.py
+```
+This creates a compatible RandomForest model. Replace it with your real model anytime.
 
-### Business Impact
-- ⚡ **90% reduction** in loan processing time
-- 📈 **Consistent decisions** across all applications
-- 🎯 **Data-driven insights** for credit risk assessment
+### 3. Run the app
+```bash
+python app.py
+```
+Visit: http://localhost:5000
 
-## ✨ Key Features
+---
 
-### Core Functionality
-| Feature | Description |
-|---------|-------------|
-| **ML-Powered Prediction** | XGBoost model analyzing 32 financial parameters |
-| **Real-time Web Interface** | User-friendly form for instant loan eligibility checks |
-| **High Accuracy** | 88% accuracy with 0.89 AUC-ROC |
-| **Feature Engineering** | Loan-to-income ratio, EMI calculations, log transforms |
+## Features
 
-### Technical Highlights
-- 🔄 **Complete preprocessing pipeline** (imputation, encoding, scaling)
-- 📊 **5-fold cross-validation** for robust model selection
-- 🎨 **Interactive dashboard** with prediction history
-- 🔒 **Stateless API** with consistent feature alignment
-- 📈 **Visual analytics** (confusion matrix, ROC curves, feature importance)
+| Feature | Status |
+|---------|--------|
+| User Registration & Login | ✅ |
+| Protected Routes | ✅ |
+| Loan Prediction Form (7 inputs) | ✅ |
+| Credit Score Color Indicator | ✅ |
+| Result Page with Confidence % | ✅ |
+| EMI Calculation (8.5% p.a.) | ✅ |
+| Prediction History Table | ✅ |
+| Delete Old Predictions | ✅ |
+| Export History as CSV | ✅ |
+| Dashboard with Stats | ✅ |
+| Admin Panel | ✅ |
+| Demo Fallback (no model needed) | ✅ |
 
-## 🛠 Technology Stack
+---
 
-### Core Technologies
+## Model Requirements
+
+The app expects `model.pkl` trained on **9 features** in this order:
+
 ```python
-{
-    "Language": "Python 3.8+",
-    "ML Framework": "XGBoost, Scikit-learn",
-    "Web Framework": "Flask",
-    "Data Processing": "Pandas, NumPy",
-    "Visualization": "Matplotlib, Seaborn",
-    "Serialization": "Pickle"
-}
+[
+    'annual_income',       # float
+    'credit_score',        # int  (300–850)
+    'age',                 # int  (18–75)
+    'existing_debts',      # float
+    'loan_amount',         # float
+    'loan_term',           # int  (12/24/36/60/120)
+    'emp_employed',        # 0 or 1
+    'emp_self_employed',   # 0 or 1
+    'emp_unemployed',      # 0 or 1
+]
+```
+
+The model should have `predict_proba()` for confidence scores (e.g. RandomForest, GradientBoosting, LogisticRegression). Binary classification: **1 = Approved, 0 = Rejected**.
+
+---
+
+## Making Yourself Admin
+
+After registering, run:
+```bash
+sqlite3 instance/loan_app.db "UPDATE users SET is_admin=1 WHERE username='your_username';"
+```
+
+---
+
+## Project Structure
+
+```
+loan_app/
+├── app.py               # Main Flask application
+├── generate_model.py    # Demo model generator
+├── requirements.txt
+├── model.pkl            # ← Your ML model goes here
+├── instance/
+│   └── loan_app.db      # SQLite database (auto-created)
+└── templates/
+    ├── base.html
+    ├── landing.html
+    ├── login.html
+    ├── register.html
+    ├── dashboard.html
+    ├── predict.html
+    ├── result.html
+    ├── history.html
+    └── admin.html
+```
+
+---
+
+## Configuration
+
+Set environment variables before running in production:
+
+```bash
+export SECRET_KEY="your-super-secret-key-here"
+```
